@@ -10,4 +10,5 @@ type IPpost struct {
 type IPdetails struct {
 	MACaddress string    `json:"MACaddress"`
 	LeaseTime  time.Time `json:"leaseTime"`
+	Available  bool      `json:"available"`
 }

@@ -8,7 +8,5 @@ import (
 
 func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Temporary text
-		w.Header().Set("content-type", "application/json")
 	}
 }

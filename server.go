@@ -52,7 +52,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Compress(5, "application/json"))
 
-	//	Get only a single user
+	//	Get all availble IP addresses
 	r.Get("/getIPpoolInfo", handlers.GetIPpoolInfo(rdb))
 	//	Delete a single user
 	r.Delete("/deleteIPfromPool", handlers.DeleteIPfromPool(rdb))
@@ -71,6 +71,7 @@ func addTestingIP(rdb *redis.Client) {
 		Detail: IP.IPdetails{
 			MACaddress: "89-43-5F-60-DC-76",
 			LeaseTime:  time.Now(),
+			Available:  true,
 		},
 	}
 
@@ -79,6 +80,7 @@ func addTestingIP(rdb *redis.Client) {
 		Detail: IP.IPdetails{
 			MACaddress: "20-F0-8F-95-CD-83",
 			LeaseTime:  time.Now(),
+			Available:  false,
 		},
 	}
 
@@ -87,6 +89,7 @@ func addTestingIP(rdb *redis.Client) {
 		Detail: IP.IPdetails{
 			MACaddress: "C2-A7-D2-35-8C-FD",
 			LeaseTime:  time.Now(),
+			Available:  false,
 		},
 	}
 
@@ -98,7 +101,7 @@ func addTestingIP(rdb *redis.Client) {
 	for _, IP := range sliceIPs {
 		//	Encode data into glob format to be stored into DB
 		BufEnString := encodeIP(IP)
-		nameKey := IP.IPaddress + "key"
+		nameKey := "a" + IP.IPaddress
 
 		err1 := rdb.Set(ctx, nameKey, BufEnString, 0).Err()
 		if err1 != nil {
@@ -114,7 +117,7 @@ func addTestingIP(rdb *redis.Client) {
 		if err != nil {
 			fmt.Println("IP not found. ERR: ", err)
 		} else {
-			fmt.Println(foundIP)
+			// fmt.Println(foundIP)
 
 			// Gob to Struct
 			bufDe := &bytes.Buffer{}
@@ -126,7 +129,7 @@ func addTestingIP(rdb *redis.Client) {
 			if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
 				log.Println(err)
 			}
-			fmt.Println("data decoded from gob:", dataDecode)
+			// fmt.Println("data decoded from gob:", dataDecode)
 
 		}
 
