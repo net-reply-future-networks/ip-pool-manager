@@ -54,7 +54,7 @@ func main() {
 
 	//	Get all availble IP addresses
 	r.Get("/allAvailbleIPs", handlers.AllAvailbleIPs(rdb))
-	//	Delete a single user
+	//	Delete an IP
 	r.Delete("/deleteIPfromPool", handlers.DeleteIPfromPool(rdb))
 	//	Post a single user
 	r.Post("/addIPtoPool", handlers.AddToIPtoPool(rdb))
