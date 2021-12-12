@@ -53,7 +53,7 @@ func main() {
 	r.Use(middleware.Compress(5, "application/json"))
 
 	//	Get all availble IP addresses
-	r.Get("/getIPpoolInfo", handlers.GetIPpoolInfo(rdb))
+	r.Get("/allAvailbleIPs", handlers.AllAvailbleIPs(rdb))
 	//	Delete a single user
 	r.Delete("/deleteIPfromPool", handlers.DeleteIPfromPool(rdb))
 	//	Post a single user
@@ -67,7 +67,7 @@ func main() {
 
 func addTestingIP(rdb *redis.Client) {
 	IP1 := IP.IPpost{
-		IPaddress: "185.9.249.220",
+		IPaddress: "a-185.9.249.220",
 		Detail: IP.IPdetails{
 			MACaddress: "89-43-5F-60-DC-76",
 			LeaseTime:  time.Now(),
@@ -76,7 +76,7 @@ func addTestingIP(rdb *redis.Client) {
 	}
 
 	IP2 := IP.IPpost{
-		IPaddress: "102.131.46.22",
+		IPaddress: "na-102.131.46.22",
 		Detail: IP.IPdetails{
 			MACaddress: "20-F0-8F-95-CD-83",
 			LeaseTime:  time.Now(),
@@ -85,7 +85,7 @@ func addTestingIP(rdb *redis.Client) {
 	}
 
 	IP3 := IP.IPpost{
-		IPaddress: "253.14.93.192",
+		IPaddress: "na-253.14.93.192",
 		Detail: IP.IPdetails{
 			MACaddress: "C2-A7-D2-35-8C-FD",
 			LeaseTime:  time.Now(),
@@ -101,7 +101,7 @@ func addTestingIP(rdb *redis.Client) {
 	for _, IP := range sliceIPs {
 		//	Encode data into glob format to be stored into DB
 		BufEnString := encodeIP(IP)
-		nameKey := "a" + IP.IPaddress
+		nameKey := IP.IPaddress
 
 		err1 := rdb.Set(ctx, nameKey, BufEnString, 0).Err()
 		if err1 != nil {
