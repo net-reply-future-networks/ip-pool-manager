@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -45,18 +46,45 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 			return
 		}
 
-		// Gob to Struct
+		// Decode returned Gob format to IP Struct
 		bufDe := &bytes.Buffer{}
 		bufDe.WriteString(val)
-
-		//	Decode returned Gob format into IP struct
 		var valDecode IP.IPpost
 		if err := gob.NewDecoder(bufDe).Decode(&valDecode); err != nil {
 			log.Println(err)
 		}
 
+		// returning copy of IP with IPaddress == na and availability = false
+		returnIP := IP.IPpost{
+			IPaddress: strings.Replace(valDecode.IPaddress, "a", "na", 1),
+			Detail: IP.IPdetails{
+				MACaddress: "89-43-5F-60-DC-76",
+				LeaseTime:  time.Now(),
+				Available:  false,
+			},
+		}
+
+		// Convert IP struct into Gob format to store in DB
+		bufEn := &bytes.Buffer{}
+		if err := gob.NewEncoder(bufEn).Encode(returnIP); err != nil {
+			panic(err)
+		}
+		returnIPdecode := bufEn.String()
+
+		//	Storing user key & value into db
+		rdb.Set(ctx, returnIP.IPaddress, returnIPdecode, 0)
+
+		//	If IP doesn't exist throw an err
+		if err := rdb.Del(ctx, valDecode.IPaddress).Err(); err != nil {
+			fmt.Println(param, "Cannot delete original IP: ", err)
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Cannot delete original IP"))
+
+		}
+
 		// Converting Struct into JSON byte to return to user
-		responseIP, err := json.Marshal(valDecode)
+		responseIP, err := json.Marshal(returnIP)
 		if err != nil {
 			panic(err)
 		}
