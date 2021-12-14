@@ -13,7 +13,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// Return all available IP's (IP's that start with "a-" not "na-")
+// AllAvailbleIPs Return all available IP's (IP's that start with "a-" not "na-")
 func AllAvailbleIPs(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		allAvailbleIPs := getAllIPs(rdb)
@@ -63,7 +63,7 @@ func getAllIPs(rdb *redis.Client) []ip.IPpost {
 	return allAvailbleIPs
 }
 
-// Returns IP's  with "availble = true"
+// Returns IP's  with "available = true"
 func findAvailbleIP(allIPs []ip.IPpost) []ip.IPpost {
 	allAvailbleIPs := []ip.IPpost{}
 

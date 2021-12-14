@@ -52,10 +52,10 @@ func main() {
 	addTestingIPs(rdb)
 
 	go checkNotAvailableIPs(rdb)
-	// creating chi multiplexor (router) for handlers
+	// creating chi multiplexer (router) for handlers
 	r := chi.NewRouter()
 
-	// setting middlewear to log server actions and compressing JSON data
+	// setting middleware to log server actions and compressing JSON data
 	r.Use(middleware.Logger)
 	r.Use(middleware.Compress(5, "application/json"))
 
@@ -220,7 +220,7 @@ func replaceNAip(rdb *redis.Client, dataDecode ip.IPpost) {
 	// Storing user key & value into db
 	rdb.Set(ctx, returnIP.IPaddress, returnIPdecode, 0)
 
-	// If IP doesn't exist throw an err
+	// If IP doesn't exist throw an error
 	if err := rdb.Del(ctx, dataDecode.IPaddress).Err(); err != nil {
 		fmt.Println(dataDecode.IPaddress, "Cannot delete original IP: ", err)
 	}

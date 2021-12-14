@@ -15,7 +15,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// Return specified IP's
+// GetIP Returns specified IP's
 func GetIP(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")

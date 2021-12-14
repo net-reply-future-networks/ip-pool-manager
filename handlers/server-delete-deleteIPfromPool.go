@@ -8,7 +8,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// Deletes the specified IP from the IP pool
+// DeleteIPfromPool Deletes the specified IP from the IP pool
 func DeleteIPfromPool(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.Background()
