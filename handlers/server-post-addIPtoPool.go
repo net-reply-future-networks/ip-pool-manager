@@ -23,7 +23,7 @@ func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 			fmt.Println("ERR: ", err)
 			w.WriteHeader(http.StatusBadGateway)
-			w.Write([]byte("Cannot decode request"))
+			w.Write([]byte("Cannot decode request")) //nolint:errcheck
 			return
 		}
 
@@ -31,7 +31,7 @@ func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 		if len(u.IPaddress) != 15 {
 			w.WriteHeader(http.StatusBadGateway)
 			resp := "IP is not correct length " + u.IPaddress
-			w.Write([]byte(resp))
+			w.Write([]byte(resp)) //nolint:errcheck
 			return
 		}
 
@@ -46,7 +46,7 @@ func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 
 		userResponse := u.IPaddress + "IP has been added to DB"
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(userResponse))
+		w.Write([]byte(userResponse)) //nolint:errcheck
 	}
 
 }

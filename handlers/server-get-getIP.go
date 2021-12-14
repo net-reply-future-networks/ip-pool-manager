@@ -27,12 +27,12 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		//	Check if URL param is empty or if specified IP is not availble
 		if param == "" {
 			fmt.Println("Empty URL parameter")
-			w.Write([]byte("Empty URL parameter"))
+			w.Write([]byte("Empty URL parameter")) //nolint:errcheck
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		} else if strings.HasPrefix(param, "na-") {
 			fmt.Println("Must select available IP")
-			w.Write([]byte("Must select available IP"))
+			w.Write([]byte("Must select available IP")) //nolint:errcheck
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -41,7 +41,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		val, err := rdb.Get(ctx, param).Result()
 		if err != nil {
 			fmt.Println("Cannot find IP")
-			w.Write([]byte("Cannot find IP"))
+			w.Write([]byte("Cannot find IP")) //nolint:errcheck
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -79,7 +79,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 			fmt.Println(param, "Cannot delete original IP: ", err)
 			w.Header().Set("content-type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("Cannot delete original IP"))
+			w.Write([]byte("Cannot delete original IP")) //nolint:errcheck
 
 		}
 
@@ -91,7 +91,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 
 		//	Send back ok status response and specified IP
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(responseIP))
+		w.Write([]byte(responseIP)) //nolint:errcheck
 	}
 
 }

@@ -34,7 +34,7 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(&uPut); err != nil {
 			fmt.Println("ERR: ", err)
 			w.WriteHeader(http.StatusBadGateway)
-			w.Write([]byte("Cannot decode request"))
+			w.Write([]byte("Cannot decode request")) //nolint:errcheck
 
 			return
 		}
@@ -44,7 +44,7 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadGateway)
 			fmt.Println(len(uPut.IPaddress))
 			resp := uPut.IPaddress + " IP is not correct length . May need to contain a- or na-"
-			w.Write([]byte(resp))
+			w.Write([]byte(resp)) //nolint:errcheck
 
 		}
 
@@ -76,7 +76,7 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 		rdb.Set(ctx, uPut.IPaddress, newIPencoded, 0)
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("IP has changed"))
+		w.Write([]byte("IP has changed")) //nolint:errcheck
 
 	}
 }

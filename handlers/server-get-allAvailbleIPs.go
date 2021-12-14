@@ -26,7 +26,7 @@ func AllAvailbleIPs(rdb *redis.Client) http.HandlerFunc {
 		//	Setting response headers and content
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(strAllAvailbleIPs))
+		w.Write([]byte(strAllAvailbleIPs)) //nolint:errcheck
 	}
 
 }
