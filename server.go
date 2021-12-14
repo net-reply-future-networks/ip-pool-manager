@@ -230,5 +230,3 @@ func replaceNAip(rdb *redis.Client, dataDecode IP.IPpost) {
 	}
 	fmt.Println("deleted old na IP")
 }
-
-// go run server.go --port 8080 --address 0.0.0.0 --redisPort 6378 --redisAddress 0.0.0.0

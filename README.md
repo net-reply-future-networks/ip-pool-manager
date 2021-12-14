@@ -19,6 +19,11 @@ First run the server:
 ./server
 ```
 
+or 
+```bash
+go run server.go --port 8080 --address 0.0.0.0 --redisPort 6378 --redisAddress 0.0.0.0
+```
+
 Use client:
 
 ```bash
