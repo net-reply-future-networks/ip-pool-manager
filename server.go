@@ -67,7 +67,7 @@ func main() {
 
 	err := http.ListenAndServe(serverAddress, r)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 }
@@ -159,9 +159,9 @@ func encodeIP(IP IP.IPpost) string {
 func checkNotAvailableIPs(rdb *redis.Client) {
 	for i := 1; i < 10000; i++ {
 		t1 := time.Now().Unix()
-
+		fmt.Println("check")
 		ctx := context.Background()
-		//	Loop used to iterate other each key that stars with "a-" in DB
+		//	Loop used to iterate other each key that stars with "na-" in DB
 		iter := rdb.Scan(ctx, 0, "na-*", 0).Iterator()
 		for iter.Next(ctx) {
 

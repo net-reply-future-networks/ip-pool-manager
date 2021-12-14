@@ -86,7 +86,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		// Converting Struct into JSON byte to return to user
 		responseIP, err := json.Marshal(returnIP)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 
 		//	Send back ok status response and specified IP

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"ip-pool-manager/IP"
+	"log"
 	"net/http"
 
 	"github.com/go-redis/redis/v8"
@@ -37,8 +38,8 @@ func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 
 		ctx := context.Background()
 
-		fmt.Println(u)
-		fmt.Println(u.IPaddress)
+		// These print are for debug purposes
+		log.Printf("Values of new IP. IP address : %v. Value: %v", u, u.IPaddress)
 
 		encodedU := encodeIP(u)
 		//	Storing user key & value into db
@@ -56,7 +57,7 @@ func encodeIP(IP IP.IPpost) string {
 	// struct to Gob
 	bufEn := &bytes.Buffer{}
 	if err := gob.NewEncoder(bufEn).Encode(IP); err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	BufEnString := bufEn.String()
 

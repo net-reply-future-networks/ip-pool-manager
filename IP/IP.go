@@ -2,7 +2,7 @@ package IP
 
 import "time"
 
-//change detial to details
+// Change detial to details
 type IPpost struct {
 	IPaddress string    `json:"ip"`
 	Detail    IPdetails `json:"detail"`
