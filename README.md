@@ -2,7 +2,7 @@
 
 This ip-pool-manger Micro-Service manages IP addresses that are typically used to reserve resources for specific users or groups, or to ensure that certain ranges are used for specific purposes.
 
-TODO: Add diagram
+![overview](https://github.com/UErenReply/ip-pool-manager/blob/main/documentation/business-logic.jpg)
 
 ## Installation
 
