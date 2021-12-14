@@ -27,10 +27,10 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
 
-		//	Creating a empty user post called "uIP"
+		// Creating a empty user post called "uIP"
 		var uPut putIPpost
 
-		//	Decodes response JSON into a userPostIP object and catches any errors
+		// Decodes response JSON into a userPostIP object and catches any errors
 		if err := json.NewDecoder(r.Body).Decode(&uPut); err != nil {
 			fmt.Println("ERR: ", err)
 			w.WriteHeader(http.StatusBadGateway)
@@ -39,7 +39,7 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 			return
 		}
 
-		//	Checking if user IP value is correct lengh
+		// Checking if user IP value is correct lengh
 		if len(uPut.IPaddress) != 15 && len(uPut.IPaddress) != 16 {
 			w.WriteHeader(http.StatusBadGateway)
 			fmt.Println(len(uPut.IPaddress))
@@ -72,7 +72,7 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 		newIPencoded := encodeIP(tempIPpost)
 
 		rdb.Rename(ctx, uPut.TargetIP, uPut.IPaddress)
-		//	Storing user key & value into db
+		// Storing user key & value into db
 		rdb.Set(ctx, uPut.IPaddress, newIPencoded, 0)
 
 		w.WriteHeader(http.StatusOK)

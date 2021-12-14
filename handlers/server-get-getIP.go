@@ -15,16 +15,16 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-//	Return specified IP's
+// Return specified IP's
 func GetIP(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
 		ctx := context.Background()
 
-		//	Storing "key" url param that contains IP key/id
+		// Storing "key" url param that contains IP key/id
 		param := r.URL.Query().Get("key")
 
-		//	Check if URL param is empty or if specified IP is not availble
+		// Check if URL param is empty or if specified IP is not availble
 		if param == "" {
 			fmt.Println("Empty URL parameter")
 			w.Write([]byte("Empty URL parameter")) //nolint:errcheck
@@ -37,7 +37,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 			return
 		}
 
-		//	Retrieving IP stored in DB
+		// Retrieving IP stored in DB
 		val, err := rdb.Get(ctx, param).Result()
 		if err != nil {
 			fmt.Println("Cannot find IP")
@@ -71,10 +71,10 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		}
 		returnIPdecode := bufEn.String()
 
-		//	Storing user key & value into db
+		// Storing user key & value into db
 		rdb.Set(ctx, returnIP.IPaddress, returnIPdecode, 0)
 
-		//	If IP doesn't exist throw an err
+		// If IP doesn't exist throw an err
 		if err := rdb.Del(ctx, valDecode.IPaddress).Err(); err != nil {
 			fmt.Println(param, "Cannot delete original IP: ", err)
 			w.Header().Set("content-type", "application/json")
@@ -89,11 +89,11 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 			fmt.Println(err)
 		}
 
-		//	Send back ok status response and specified IP
+		// Send back ok status response and specified IP
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(responseIP)) //nolint:errcheck
 	}
 
 }
 
-//	curl "localhost:3000/getIP?key=a-185.9.249.220"
+//curl "localhost:3000/getIP?key=a-185.9.249.220"
