@@ -75,6 +75,9 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 		//	Storing user key & value into db
 		rdb.Set(ctx, uPut.IPaddress, newIPencoded, 0)
 
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("IP has changed"))
+
 	}
 }
 
