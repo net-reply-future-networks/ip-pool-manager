@@ -18,7 +18,7 @@ func DeleteIPfromPool(rdb *redis.Client) http.HandlerFunc {
 		//	Delete specified IP key from db
 		if param == "" {
 			fmt.Println("Empty URL parameter")
-			w.Write([]byte("Empty URL parameter"))
+			w.Write([]byte("Empty URL parameter")) //nolint:errcheck
 			w.WriteHeader(http.StatusBadRequest)
 		}
 		//	If IP doesn't exist throw an err
@@ -30,7 +30,7 @@ func DeleteIPfromPool(rdb *redis.Client) http.HandlerFunc {
 		responseMsg := param + " IP Deleted"
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(responseMsg))
+		w.Write([]byte(responseMsg)) //nolint:errcheck
 
 	}
 }

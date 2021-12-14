@@ -65,7 +65,10 @@ func main() {
 	//	Update IP details (Not create new IP)
 	r.Put("/createNewIPpool", handlers.CreateNewIPinPool(rdb))
 
-	http.ListenAndServe(serverAddress, r)
+	err := http.ListenAndServe(serverAddress, r)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }
 
@@ -223,7 +226,3 @@ func replaceNAip(rdb *redis.Client, dataDecode IP.IPpost) {
 }
 
 //	go run server.go --port 8080 --address 0.0.0.0 --redisPort 6378 --redisAddress 0.0.0.0
-
-//TODO
-// Change GET method to set a interveral timer when getting a single IP
-// Maybe add getTestingIP
