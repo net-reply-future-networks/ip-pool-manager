@@ -151,10 +151,10 @@ func addTestingIPs(rdb *redis.Client) {
 }
 
 // Encodes IP into glob format
-func encodeIP(IP IP.IPpost) string {
+func encodeIP(ip IP.IPpost) string {
 	// struct to Gob
 	bufEn := &bytes.Buffer{}
-	if err := gob.NewEncoder(bufEn).Encode(IP); err != nil {
+	if err := gob.NewEncoder(bufEn).Encode(ip); err != nil {
 		panic(err)
 	}
 	BufEnString := bufEn.String()
