@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-redis/redis/v8"
+	"github.com/common-nighthawk/go-figure"
 )
 
 // flags for custom port number and addresses to run server and redis server
@@ -25,6 +26,8 @@ var (
 
 	redisPort    = flag.Int("redis-port", 6379, "port number for redis server")
 	redisAddress = flag.String("redis-address", "localhost", "port address for redis server")
+
+	serviceName = flag.String("name", "ip-pool-manager", "name of service")
 )
 
 func main() {
@@ -34,8 +37,11 @@ func main() {
 	serverAddress := fmt.Sprintf("%v:%v", *serverAddress, *serverPort)
 	rServerAddress := fmt.Sprintf("%v:%v", *redisAddress, *redisPort)
 
-	fmt.Println(serverAddress)
-	fmt.Println(rServerAddress)
+	myFigure := figure.NewFigure(*serviceName, "", true)
+	myFigure.Print()
+
+	log.Printf("INFO: Server address: %v\n", serverAddress)
+	log.Printf("INFO: Redis address: %v\n", rServerAddress)
 
 	// creating redis server
 	rdb := redis.NewClient(&redis.Options{
