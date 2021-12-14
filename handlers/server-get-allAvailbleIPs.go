@@ -6,7 +6,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"ip-pool-manager/IP"
+	"ip-pool-manager/ip"
 	"log"
 	"net/http"
 
@@ -28,13 +28,12 @@ func AllAvailbleIPs(rdb *redis.Client) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		w.Write(strAllAvailbleIPs) //nolint:errcheck
 	}
-
 }
 
 // Returns all IP's that start with "a-" and "available = true"
-func getAllIPs(rdb *redis.Client) []IP.IPpost {
+func getAllIPs(rdb *redis.Client) []ip.IPpost {
 	ctx := context.Background()
-	allIPs := []IP.IPpost{}
+	allIPs := []ip.IPpost{}
 
 	// Loop used to iterate other each key that stars with "a-" in DB
 	iter := rdb.Scan(ctx, 0, "a-*", 0).Iterator()
@@ -51,7 +50,7 @@ func getAllIPs(rdb *redis.Client) []IP.IPpost {
 		bufDe.WriteString(foundIP)
 
 		// Decode returned Gob format into IP struct
-		var dataDecode IP.IPpost
+		var dataDecode ip.IPpost
 		if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
 			log.Println(err)
 			continue
@@ -65,8 +64,8 @@ func getAllIPs(rdb *redis.Client) []IP.IPpost {
 }
 
 // Returns IP's  with "availble = true"
-func findAvailbleIP(allIPs []IP.IPpost) []IP.IPpost {
-	allAvailbleIPs := []IP.IPpost{}
+func findAvailbleIP(allIPs []ip.IPpost) []ip.IPpost {
+	allAvailbleIPs := []ip.IPpost{}
 
 	// Check to see if IP is available or not
 	for _, IP := range allIPs {

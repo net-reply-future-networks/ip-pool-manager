@@ -6,7 +6,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"ip-pool-manager/IP"
+	"ip-pool-manager/ip"
 	"log"
 	"net/http"
 	"strings"
@@ -49,15 +49,15 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		// Decode returned Gob format to IP Struct
 		bufDe := &bytes.Buffer{}
 		bufDe.WriteString(val)
-		var valDecode IP.IPpost
+		var valDecode ip.IPpost
 		if err := gob.NewDecoder(bufDe).Decode(&valDecode); err != nil {
 			log.Println(err)
 		}
 
 		// returning copy of IP with IPaddress == na and availability = false
-		returnIP := IP.IPpost{
+		returnIP := ip.IPpost{
 			IPaddress: strings.Replace(valDecode.IPaddress, "a", "na", 1),
-			Detail: IP.IPdetails{
+			Detail: ip.IPdetails{
 				MACaddress: "89-43-5F-60-DC-76",
 				LeaseTime:  time.Now(),
 				Available:  false,
@@ -93,7 +93,6 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		w.Write(responseIP) //nolint:errcheck
 	}
-
 }
 
-//curl "localhost:3000/getIP?key=a-185.9.249.220"
+// curl "localhost:3000/getIP?key=a-185.9.249.220"

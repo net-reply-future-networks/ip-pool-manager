@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"ip-pool-manager/IP"
+	"ip-pool-manager/ip"
 	"net/http"
 	"time"
 
@@ -60,9 +60,9 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 			return
 		}
 
-		tempIPpost := IP.IPpost{
+		tempIPpost := ip.IPpost{
 			IPaddress: uPut.IPaddress,
-			Detail: IP.IPdetails{
+			Detail: ip.IPdetails{
 				MACaddress: uPut.Detail.MACaddress,
 				LeaseTime:  uPut.Detail.LeaseTime,
 				Available:  uPut.Detail.Available,
@@ -77,7 +77,6 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("IP has changed")) //nolint:errcheck
-
 	}
 }
 

@@ -31,7 +31,6 @@ func DeleteIPfromPool(rdb *redis.Client) http.HandlerFunc {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(responseMsg)) //nolint:errcheck
-
 	}
 }
 

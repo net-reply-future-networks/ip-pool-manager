@@ -6,7 +6,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"ip-pool-manager/IP"
+	"ip-pool-manager/ip"
 	"log"
 	"net/http"
 
@@ -18,7 +18,7 @@ func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 		w.Header().Set("content-type", "application/json")
 
 		// Creating a empty user post called "u"
-		var u IP.IPpost
+		var u ip.IPpost
 
 		// Decodes response JSON into a userPostIP object and catches any errors
 		if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
@@ -49,11 +49,10 @@ func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(userResponse)) //nolint:errcheck
 	}
-
 }
 
 // Encodes IP into glob format
-func encodeIP(ip IP.IPpost) string {
+func encodeIP(ip ip.IPpost) string {
 	// struct to Gob
 	bufEn := &bytes.Buffer{}
 	if err := gob.NewEncoder(bufEn).Encode(ip); err != nil {

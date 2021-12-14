@@ -1,4 +1,4 @@
-package IP
+package ip
 
 import "time"
 

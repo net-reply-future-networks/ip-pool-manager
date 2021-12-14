@@ -6,17 +6,17 @@ import (
 	"encoding/gob"
 	"flag"
 	"fmt"
-	"ip-pool-manager/IP"
 	"ip-pool-manager/handlers"
+	"ip-pool-manager/ip"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/common-nighthawk/go-figure"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-redis/redis/v8"
-	"github.com/common-nighthawk/go-figure"
 )
 
 // flags for custom port number and addresses to run server and redis server
@@ -31,7 +31,6 @@ var (
 )
 
 func main() {
-
 	flag.Parse()
 
 	serverAddress := fmt.Sprintf("%v:%v", *serverAddress, *serverPort)
@@ -75,38 +74,37 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 func addTestingIPs(rdb *redis.Client) {
-	IP1 := IP.IPpost{
+	IP1 := ip.IPpost{
 		IPaddress: "a-185.9.249.220",
-		Detail: IP.IPdetails{
+		Detail: ip.IPdetails{
 			MACaddress: "89-43-5F-60-DC-76",
 			LeaseTime:  time.Now(),
 			Available:  true,
 		},
 	}
 
-	IP2 := IP.IPpost{
+	IP2 := ip.IPpost{
 		IPaddress: "na-102.131.46.22",
-		Detail: IP.IPdetails{
+		Detail: ip.IPdetails{
 			MACaddress: "20-F0-8F-95-CD-83",
 			LeaseTime:  time.Now(),
 			Available:  false,
 		},
 	}
 
-	IP3 := IP.IPpost{
+	IP3 := ip.IPpost{
 		IPaddress: "a-253.14.93.192",
-		Detail: IP.IPdetails{
+		Detail: ip.IPdetails{
 			MACaddress: "C2-A7-D2-35-8C-FD",
 			LeaseTime:  time.Now(),
 			Available:  true,
 		},
 	}
 
-	sliceIPs := []IP.IPpost{IP1, IP2, IP3}
+	sliceIPs := []ip.IPpost{IP1, IP2, IP3}
 
 	ctx := context.Background()
 
@@ -138,7 +136,7 @@ func addTestingIPs(rdb *redis.Client) {
 			bufDe.WriteString(foundIP)
 
 			// Decode returned Gob format into IP struct
-			var dataDecode IP.IPpost
+			var dataDecode ip.IPpost
 			if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
 				log.Println(err)
 			}
@@ -147,11 +145,10 @@ func addTestingIPs(rdb *redis.Client) {
 		}
 
 	}
-
 }
 
 // Encodes IP into glob format
-func encodeIP(ip IP.IPpost) string {
+func encodeIP(ip ip.IPpost) string {
 	// struct to Gob
 	bufEn := &bytes.Buffer{}
 	if err := gob.NewEncoder(bufEn).Encode(ip); err != nil {
@@ -183,7 +180,7 @@ func checkNotAvailableIPs(rdb *redis.Client) {
 			bufDe.WriteString(foundIP)
 
 			// Decode returned Gob format into IP struct
-			var dataDecode IP.IPpost
+			var dataDecode ip.IPpost
 			if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
 				log.Println(err)
 				continue
@@ -201,13 +198,12 @@ func checkNotAvailableIPs(rdb *redis.Client) {
 
 		time.Sleep(5 * time.Second)
 	}
-
 }
 
-func replaceNAip(rdb *redis.Client, dataDecode IP.IPpost) {
-	returnIP := IP.IPpost{
+func replaceNAip(rdb *redis.Client, dataDecode ip.IPpost) {
+	returnIP := ip.IPpost{
 		IPaddress: strings.Replace(dataDecode.IPaddress, "na", "a", 1),
-		Detail: IP.IPdetails{
+		Detail: ip.IPdetails{
 			MACaddress: dataDecode.Detail.MACaddress,
 			LeaseTime:  dataDecode.Detail.LeaseTime,
 			Available:  true,
