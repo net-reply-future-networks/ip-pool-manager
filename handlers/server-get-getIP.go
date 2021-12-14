@@ -91,7 +91,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 
 		// Send back ok status response and specified IP
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(responseIP)) //nolint:errcheck
+		w.Write(responseIP) //nolint:errcheck
 	}
 
 }
