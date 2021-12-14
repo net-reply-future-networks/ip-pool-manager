@@ -10,6 +10,7 @@ import (
 	"ip-pool-manager/handlers"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -43,8 +44,9 @@ func main() {
 		DB:       0,              // use default DB
 	})
 
-	addTestingIP(rdb)
+	addTestingIPs(rdb)
 
+	go checkNotAvailableIPs(rdb)
 	//	creating chi multiplexor (router) for handlers
 	r := chi.NewRouter()
 
@@ -52,20 +54,22 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Compress(5, "application/json"))
 
-	//	Get all availble IP addresses
+	//	Get available single IP details from DB. Replaces the availble IP with idential na-IP
+	r.Get("/getIP", handlers.GetIP(rdb))
+	//	Get all available IP addresses from DB
 	r.Get("/allAvailbleIPs", handlers.AllAvailbleIPs(rdb))
-	//	Delete an IP
+	//	Delete an IP "Must include IP key name. Not just IP"
 	r.Delete("/deleteIPfromPool", handlers.DeleteIPfromPool(rdb))
-	//	Post a single user
+	//	Create new IP and store into DB
 	r.Post("/addIPtoPool", handlers.AddToIPtoPool(rdb))
-	//	Update user value
+	//	Update IP details (Not create new IP)
 	r.Put("/createNewIPpool", handlers.CreateNewIPinPool(rdb))
 
 	http.ListenAndServe(serverAddress, r)
 
 }
 
-func addTestingIP(rdb *redis.Client) {
+func addTestingIPs(rdb *redis.Client) {
 	IP1 := IP.IPpost{
 		IPaddress: "a-185.9.249.220",
 		Detail: IP.IPdetails{
@@ -85,11 +89,11 @@ func addTestingIP(rdb *redis.Client) {
 	}
 
 	IP3 := IP.IPpost{
-		IPaddress: "na-253.14.93.192",
+		IPaddress: "a-253.14.93.192",
 		Detail: IP.IPdetails{
 			MACaddress: "C2-A7-D2-35-8C-FD",
 			LeaseTime:  time.Now(),
-			Available:  false,
+			Available:  true,
 		},
 	}
 
@@ -149,79 +153,77 @@ func encodeIP(IP IP.IPpost) string {
 	return BufEnString
 }
 
-//	Return all IP's as a string
-// func getTestingIP(rdb *redis.Client) {
+func checkNotAvailableIPs(rdb *redis.Client) {
+	for i := 1; i < 10000; i++ {
+		t1 := time.Now().Unix()
 
-// 	ctx := context.Background()
+		ctx := context.Background()
+		//	Loop used to iterate other each key that stars with "a-" in DB
+		iter := rdb.Scan(ctx, 0, "na-*", 0).Iterator()
+		for iter.Next(ctx) {
 
-// 	//	Loop used to iterate other each key in DB
-// 	iter := rdb.Scan(ctx, 0, "*", 0).Iterator()
+			//	Storing each IP in DB
+			foundIP, err := rdb.Get(ctx, iter.Val()).Result()
+			if err != nil {
+				fmt.Println("IP not found. ERR: ", err)
+				continue
+			}
 
-// 	// fmt.Println("--------------------------------")
-// 	// fmt.Println("Getting all users...")
+			// Gob to Struct
+			bufDe := &bytes.Buffer{}
+			bufDe.WriteString(foundIP)
 
-// 	for iter.Next(ctx) {
-// 		//	Storing each user value (key value)
-// 		foundIP, err := rdb.Get(ctx, iter.Val()).Result()
-// 		if err != nil {
-// 			fmt.Println(err)
-// 		} else {
-// 			fmt.Println("found IP: ", foundIP)
-// 		}
+			//	Decode returned Gob format into IP struct
+			var dataDecode IP.IPpost
+			if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
+				log.Println(err)
+				continue
+			}
 
-// 	}
+			//	Making sure that every Go routine create has a 5 second life span
+			t2 := dataDecode.Detail.LeaseTime.Add(time.Second * 5).Unix()
 
-// 	foundUser := getIP(rdb, "1")
-// 	fmt.Println("Found user --> ", foundUser)
+			if t1 >= t2 {
+				fmt.Println("GO ROUTINE EXPIRED")
+				replaceNAip(rdb, dataDecode)
 
-// 	// //	Convert JSON byte data to IP struct
-// 	// structIPs := IPsJsonToStruct(jsonIPs)
-// }
+			}
+		}
 
-//	Convert struct to JSON byte data
-// func structIPtoJson(IP IP.IPpost) []byte {
-// 	// Struct to JSON
-// 	var jsonIPmarshal []byte
+		time.Sleep(5 * time.Second)
+	}
 
-// 	jsonIPmarshal, err := json.Marshal(IP)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
+}
 
-// 	return jsonIPmarshal
-// }
+func replaceNAip(rdb *redis.Client, dataDecode IP.IPpost) {
+	returnIP := IP.IPpost{
+		IPaddress: strings.Replace(dataDecode.IPaddress, "na", "a", 1),
+		Detail: IP.IPdetails{
+			MACaddress: dataDecode.Detail.MACaddress,
+			LeaseTime:  dataDecode.Detail.LeaseTime,
+			Available:  true,
+		},
+	}
+	// Convert IP struct into Gob format to store in DB
+	bufEn := &bytes.Buffer{}
+	if err := gob.NewEncoder(bufEn).Encode(returnIP); err != nil {
+		panic(err)
+	}
+	returnIPdecode := bufEn.String()
 
-// return IP from DB as a string (unmarshaled)
-// func getIP(rdb *redis.Client, Key string) string {
-// 	ctx := context.Background()
+	ctx := context.Background()
+	//	Storing user key & value into db
+	rdb.Set(ctx, returnIP.IPaddress, returnIPdecode, 0)
 
-// 	val, err := rdb.Get(ctx, Key).Result()
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-
-// 	var dataUnmarshal IP.IPpost
-// 	err = json.Unmarshal(val, &dataUnmarshal)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-// 	return val
-// }
-
-//	Convert a slice of data into JSON byte data
-// func IPsJsonToStruct(jsonIPs []byte) []IP.IPpost {
-// 	IPstruct := make([]IP.IPpost, 0)
-// 	json.Unmarshal(jsonIPs, &IPstruct)
-// 	println("-----IP addresses stored-----")
-// 	for _, user := range IPstruct {
-// 		fmt.Println(user)
-// 	}
-// 	return IPstruct
-// }
-
-//	curl "localhost:3000/allUsers"
-//	curl "localhost:3000/getUser?key=name1'
-//	curl -X DELETE "localhost:3000/deleteUser?key=user2"
-//  curl -X POST -H 'content-type: application/json' --data '{"key": "john","vaye": "stuff"}' http://localhost:3000/createUser
+	//	If IP doesn't exist throw an err
+	if err := rdb.Del(ctx, dataDecode.IPaddress).Err(); err != nil {
+		fmt.Println(dataDecode.IPaddress, "Cannot delete original IP: ", err)
+	}
+	fmt.Println("deleted old na IP")
+}
 
 //	go run server.go --port 8080 --address 0.0.0.0 --redisPort 6378 --redisAddress 0.0.0.0
+
+//TODO
+// Change GET method to set a interveral timer when getting a single IP
+// Maybe add getTestingIP
