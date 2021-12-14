@@ -138,12 +138,17 @@ func addTestingIPs(rdb *redis.Client) {
 	for _, IP := range sliceIPs {
 		log.Println("DEBUG: Adding sample data to Database: v%", IP)
 		//	Encode data into glob format to be stored into DB
-		BufEnString := encodeIP(IP)
+		BufEnString, err := encodeIP(IP)
+		if err != nil {
+			log.Println("ERROR: Could not encode IP", err)
+			continue
+		}
 		nameKey := IP.IPaddress
 
-		err1 := rdb.Set(ctx, nameKey, BufEnString, 0).Err()
-		if err1 != nil {
-			log.Println(err1)
+		err = rdb.Set(ctx, nameKey, BufEnString, 0).Err()
+		if err != nil {
+			log.Printf("ERROR: Could not set Key-Value in Redis: %v\n", err)
+			continue
 		}
 	}
 
@@ -175,16 +180,15 @@ func addTestingIPs(rdb *redis.Client) {
 }
 
 // Encodes IP into glob format
-func encodeIP(ip ip.IPpost) string {
+func encodeIP(ip ip.IPpost) (string, error) {
 	// struct to Gob
 	bufEn := &bytes.Buffer{}
 	if err := gob.NewEncoder(bufEn).Encode(ip); err != nil {
-		log.Println(err)
-		return "" // TODO: Return error
+		return "", err
 	}
 	BufEnString := bufEn.String()
 
-	return BufEnString
+	return BufEnString, nil
 }
 
 func checkNotAvailableIPs(rdb *redis.Client) {
@@ -221,7 +225,6 @@ func checkNotAvailableIPs(rdb *redis.Client) {
 			if t1 >= t2 {
 				log.Printf("INFO: Lease expired for IP: %v , MAC: %v \n", dataDecode.IPaddress, dataDecode.Detail.MACaddress)
 				replaceNAip(rdb, dataDecode)
-				log.Printf("INFO: IP is set free for reallocation: %v\n", dataDecode.IPaddress)
 			}
 		}
 
@@ -255,4 +258,5 @@ func replaceNAip(rdb *redis.Client, dataDecode ip.IPpost) {
 	if err := rdb.Del(ctx, dataDecode.IPaddress).Err(); err != nil {
 		log.Println(dataDecode.IPaddress, "Cannot delete original IP: ", err)
 	}
+	log.Printf("INFO: IP is set free for reallocation: %v\n", returnIP.IPaddress)
 }
