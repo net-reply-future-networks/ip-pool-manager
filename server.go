@@ -18,21 +18,21 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+// flags for custom port number and addresses to run server and redis server
 var (
-	// flag for custom port number and addresses to run server and redis server
-	portNum     = flag.Int("port", 3000, "Please enter port number")
-	portAddress = flag.String("address", "localhost", "Please enter a port address")
+	serverPort    = flag.Int("port", 3000, "port number")
+	serverAddress = flag.String("address", "localhost", "port address")
 
-	rPortNum     = flag.Int("redisPort", 6379, "Please enter port number for redis server")
-	rPortAddress = flag.String("redisAddress", "localhost", "Please enter a port address for redis server")
+	redisPort    = flag.Int("redis-port", 6379, "port number for redis server")
+	redisAddress = flag.String("redis-address", "localhost", "port address for redis server")
 )
 
 func main() {
 
 	flag.Parse()
 
-	serverAddress := fmt.Sprintf("%v:%v", *portAddress, *portNum)
-	rServerAddress := fmt.Sprintf("%v:%v", *rPortAddress, *rPortNum)
+	serverAddress := fmt.Sprintf("%v:%v", *serverAddress, *serverPort)
+	rServerAddress := fmt.Sprintf("%v:%v", *redisAddress, *redisPort)
 
 	fmt.Println(serverAddress)
 	fmt.Println(rServerAddress)
