@@ -27,7 +27,7 @@ func DeleteIPfromPool(rdb *redis.Client) http.HandlerFunc {
 			log.Println(param, " Error: ", err)
 		}
 		// Send back ok status response and "User Deleted" message
-		responseMsg := param + " IP Deleted"
+		responseMsg := param + " IP deleted \n"
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(responseMsg)) //nolint:errcheck

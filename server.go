@@ -10,7 +10,10 @@ import (
 	"ip-pool-manager/ip"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/common-nighthawk/go-figure"
@@ -24,13 +27,15 @@ var (
 	serverPort    = flag.Int("port", 3000, "port number")
 	serverAddress = flag.String("address", "localhost", "port address")
 
-	redisPort    = flag.Int("redis-port", 6379, "port number for redis server")
-	redisAddress = flag.String("redis-address", "localhost", "port address for redis server")
+	redisPort    = flag.Int("redis-port", 6379, "port number of redis server")
+	redisAddress = flag.String("redis-address", "localhost", "port address of redis server")
 
 	serviceName = flag.String("name", "ip-pool-manager", "name of service")
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile) // this enables line logging
+
 	flag.Parse()
 
 	serverAddress := fmt.Sprintf("%v:%v", *serverAddress, *serverPort)
@@ -42,7 +47,7 @@ func main() {
 	log.Printf("INFO: Server address: %v\n", serverAddress)
 	log.Printf("INFO: Redis address: %v\n", rServerAddress)
 
-	// creating redis server
+	// creating redis client
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     rServerAddress, // redis address
 		Password: "",             // no password set
@@ -52,6 +57,7 @@ func main() {
 	addTestingIPs(rdb)
 
 	go checkNotAvailableIPs(rdb)
+
 	// creating chi multiplexer (router) for handlers
 	r := chi.NewRouter()
 
@@ -59,7 +65,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Compress(5, "application/json"))
 
-	// Get available single IP details from DB. Replaces the availble IP with idential na-IP
+	// Get available single IP details from DB. Replaces the available IP with identical na-IP
 	r.Get("/getIP", handlers.GetIP(rdb))
 	// Get all available IP addresses from DB
 	r.Get("/allAvailbleIPs", handlers.AllAvailbleIPs(rdb))
@@ -70,8 +76,28 @@ func main() {
 	// Update IP details (Not create new IP)
 	r.Put("/createNewIPpool", handlers.CreateNewIPinPool(rdb))
 
-	err := http.ListenAndServe(serverAddress, r)
-	if err != nil {
+	srv := &http.Server{Addr: serverAddress, Handler: r}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+
+	go func() {
+		log.Println("INFO: Starting server")
+		if err := srv.ListenAndServe(); err != nil {
+			if err != http.ErrServerClosed { // TODO: Will fail wrapped errors using != use errors.Is
+				log.Fatal(err)
+			}
+		}
+	}()
+
+	<-stop
+
+	log.Println("INFO: Received shutdown signal, shutting down server")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -110,6 +136,7 @@ func addTestingIPs(rdb *redis.Client) {
 
 	// Encodes and stores IP's into DB
 	for _, IP := range sliceIPs {
+		log.Println("DEBUG: Adding sample data to Database: v%", IP)
 		//	Encode data into glob format to be stored into DB
 		BufEnString := encodeIP(IP)
 		nameKey := IP.IPaddress
@@ -120,31 +147,31 @@ func addTestingIPs(rdb *redis.Client) {
 		}
 	}
 
-	// Loop used to iterate other each key in DB
-	iter := rdb.Scan(ctx, 0, "*", 0).Iterator()
-	for iter.Next(ctx) {
-		// Storing each IP in DB
-		foundIP, err := rdb.Get(ctx, iter.Val()).Result()
-		if err != nil {
-			fmt.Println("IP not found. ERR: ", err)
-		} else {
-			// fmt.Println(foundIP)
+	//TODO: For what is the code block used?
+	/*	// Loop used to iterate other each key in DB
+		iter := rdb.Scan(ctx, 0, "*", 0).Iterator()
+		for iter.Next(ctx) {
+			// Storing each IP in DB
+			foundIP, err := rdb.Get(ctx, iter.Val()).Result()
+			if err != nil {
+				log.Println("IP not found. ERR: ", err)
+			} else {
+				// log.Println(foundIP)
 
-			// Gob to Struct
-			bufDe := &bytes.Buffer{}
+				// Gob to Struct
+				bufDe := &bytes.Buffer{}
 
-			bufDe.WriteString(foundIP)
+				bufDe.WriteString(foundIP)
 
-			// Decode returned Gob format into IP struct
-			var dataDecode ip.IPpost
-			if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
-				log.Println(err)
+				// Decode returned Gob format into IP struct
+				var dataDecode ip.IPpost
+				if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
+					log.Println(err)
+				}
+				// log.Println("data decoded from gob:", dataDecode)
+
 			}
-			// fmt.Println("data decoded from gob:", dataDecode)
-
-		}
-
-	}
+		}*/
 }
 
 // Encodes IP into glob format
@@ -152,7 +179,8 @@ func encodeIP(ip ip.IPpost) string {
 	// struct to Gob
 	bufEn := &bytes.Buffer{}
 	if err := gob.NewEncoder(bufEn).Encode(ip); err != nil {
-		panic(err)
+		log.Println(err)
+		return "" // TODO: Return error
 	}
 	BufEnString := bufEn.String()
 
@@ -160,18 +188,20 @@ func encodeIP(ip ip.IPpost) string {
 }
 
 func checkNotAvailableIPs(rdb *redis.Client) {
+	log.Println("INFO: Goroutine started in the background checking for expired leases")
+
 	for {
 		t1 := time.Now().Unix()
-		fmt.Println("check")
+		log.Println("INFO: Checking for expired leases in order to free IP for reallocation")
 		ctx := context.Background()
+
 		// Loop used to iterate other each key that stars with "na-" in DB
 		iter := rdb.Scan(ctx, 0, "na-*", 0).Iterator()
 		for iter.Next(ctx) {
-
 			// Storing each IP in DB
 			foundIP, err := rdb.Get(ctx, iter.Val()).Result()
 			if err != nil {
-				fmt.Println("IP not found. ERR: ", err)
+				log.Printf("ERROR: IP not found: %v\n", err)
 				continue
 			}
 
@@ -182,21 +212,21 @@ func checkNotAvailableIPs(rdb *redis.Client) {
 			// Decode returned Gob format into IP struct
 			var dataDecode ip.IPpost
 			if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
-				log.Println(err)
+				log.Printf("ERROR: Could not decode gob data: %v\n", err)
 				continue
 			}
 
-			// Making sure that every Go routine create has a 5 second life span
-			t2 := dataDecode.Detail.LeaseTime.Add(time.Second * 5).Unix()
-
+			// Making sure that every Go routine create has a 5-second life span
+			t2 := dataDecode.Detail.LeaseTime.Add(time.Second * 5).Unix() // TODO: Make 5 seconds a flag
 			if t1 >= t2 {
-				fmt.Println("GO ROUTINE EXPIRED")
+				log.Printf("INFO: Lease expired for IP: %v , MAC: %v \n", dataDecode.IPaddress, dataDecode.Detail.MACaddress)
 				replaceNAip(rdb, dataDecode)
-
+				log.Printf("INFO: IP is set free for reallocation: %v\n", dataDecode.IPaddress)
 			}
 		}
 
-		time.Sleep(5 * time.Second)
+		log.Println("INFO: Sleeping before checking again for expired leases")
+		time.Sleep(5 * time.Second) // TODO: Make this a flag
 	}
 }
 
@@ -212,7 +242,8 @@ func replaceNAip(rdb *redis.Client, dataDecode ip.IPpost) {
 	// Convert IP struct into Gob format to store in DB
 	bufEn := &bytes.Buffer{}
 	if err := gob.NewEncoder(bufEn).Encode(returnIP); err != nil {
-		panic(err)
+		log.Println(err)
+		return // TODO: Return error
 	}
 	returnIPdecode := bufEn.String()
 
@@ -222,7 +253,6 @@ func replaceNAip(rdb *redis.Client, dataDecode ip.IPpost) {
 
 	// If IP doesn't exist throw an error
 	if err := rdb.Del(ctx, dataDecode.IPaddress).Err(); err != nil {
-		fmt.Println(dataDecode.IPaddress, "Cannot delete original IP: ", err)
+		log.Println(dataDecode.IPaddress, "Cannot delete original IP: ", err)
 	}
-	fmt.Println("deleted old na IP")
 }

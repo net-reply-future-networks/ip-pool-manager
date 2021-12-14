@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"ip-pool-manager/ip"
+	"log"
 	"net/http"
 	"time"
 
@@ -42,21 +43,20 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 		// Checking if user IP value is correct lengh
 		if len(uPut.IPaddress) != 15 && len(uPut.IPaddress) != 16 {
 			w.WriteHeader(http.StatusBadGateway)
-			fmt.Println(len(uPut.IPaddress))
+			log.Println(len(uPut.IPaddress))
 			resp := uPut.IPaddress + " IP is not correct length . May need to contain a- or na-"
 			w.Write([]byte(resp)) //nolint:errcheck
-
 		}
 
 		ctx := context.Background()
 		_, err := rdb.Get(ctx, uPut.TargetIP).Result()
 		switch {
-		case err == redis.Nil:
-			fmt.Println("key does not exist")
-			fmt.Println(uPut.TargetIP)
+		case err == redis.Nil: // TODO: Will fail wrapped errors using == use errors.Is
+			log.Println("key does not exist")
+			log.Println(uPut.TargetIP)
 			return
 		case err != nil:
-			fmt.Println("Get failed", err)
+			log.Println("Get failed", err)
 			return
 		}
 
@@ -76,7 +76,7 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 		rdb.Set(ctx, uPut.IPaddress, newIPencoded, 0)
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("IP has changed")) //nolint:errcheck
+		w.Write([]byte("IP has changed \n")) //nolint:errcheck
 	}
 }
 

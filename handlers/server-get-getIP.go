@@ -24,7 +24,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		// Storing "key" url param that contains IP key/id
 		param := r.URL.Query().Get("key")
 
-		// Check if URL param is empty or if specified IP is not availble
+		// Check if URL param is empty or if specified IP is not available
 		if param == "" {
 			fmt.Println("Empty URL parameter")
 			w.Write([]byte("Empty URL parameter")) //nolint:errcheck
@@ -76,17 +76,16 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 
 		// If IP doesn't exist throw an err
 		if err := rdb.Del(ctx, valDecode.IPaddress).Err(); err != nil {
-			fmt.Println(param, "Cannot delete original IP: ", err)
+			log.Println(param, "Cannot delete original IP: ", err)
 			w.Header().Set("content-type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Cannot delete original IP")) //nolint:errcheck
-
 		}
 
 		// Converting Struct into JSON byte to return to user
 		responseIP, err := json.Marshal(returnIP)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		// Send back ok status response and specified IP
