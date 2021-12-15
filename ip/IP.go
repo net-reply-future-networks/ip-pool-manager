@@ -2,7 +2,7 @@ package ip
 
 import "time"
 
-// Change detial to details
+// IPpost is used to store data
 type IPpost struct {
 	IPaddress string    `json:"ip"`
 	Detail    IPdetails `json:"detail"`
