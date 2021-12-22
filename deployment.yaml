@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ip-pool-manager-deployment
+  labels:
+    app: ip-pool-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ip-pool-manager
+  template:
+    metadata:
+      labels:
+        app: ip-pool-manager
+    spec:
+      containers:
+        - name: ip-pool-manager
+          image: ghcr.io/uerenreply/ip-pool-manager:main
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+      imagePullSecrets:
+        - name: ghcr
