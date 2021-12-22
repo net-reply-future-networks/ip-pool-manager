@@ -1,34 +1,61 @@
-FROM golang:alpine
+ARG  BUILDER_IMAGE=golang:alpine
+############################
+# STEP 1 build executable binary
+############################
+FROM ${BUILDER_IMAGE} as builder
 
-# Set necessary environmet variables needed for our image
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
+# Install git + SSL ca certificates.
+# Git is required for fetching the dependencies.
+# Ca-certificates is required to call HTTPS endpoints.
+RUN apk update && apk add --no-cache git ca-certificates tzdata && update-ca-certificates
 
-# Move to working directory /build
-WORKDIR /build
+# Create appuser
+ENV USER=appuser
+ENV UID=10001
 
-# Copy and download dependency using go mod
+# See https://stackoverflow.com/a/55757473/12429735
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    "${USER}"
+WORKDIR $GOPATH/src/mypackage/myapp/
+
+# use modules
 COPY go.mod .
-COPY go.sum .
-RUN go mod download
 
-# Copy the code into the container
+ENV GO111MODULE=on
+RUN go mod download
+RUN go mod verify
+
 COPY . .
 
-# Build the application
-RUN go build -o main 
+# Build the binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build \
+    -ldflags='-w -s -extldflags "-static"' -a \
+    -o /go/bin/hello .
 
-# Move to /dist directory as the place for resulting binary folder
-WORKDIR /dist
+############################
+# STEP 2 build a small image
+############################
+FROM scratch
 
-# Copy binary from build to main folder
-RUN cp /build/main .
+# Import from builder.
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
 
-# Export necessary port
-EXPOSE 3000
+# Copy our static executable
+COPY --from=builder /go/bin/hello /go/bin/hello
 
-# Command to run when starting the container
-CMD ["/dist/main"]
+# Use an unprivileged user.
+USER appuser:appuser
 
+EXPOSE 8080
+
+# Run the hello binary.
+ENTRYPOINT ["/go/bin/hello"]
