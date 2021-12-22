@@ -260,3 +260,8 @@ func replaceNAip(rdb *redis.Client, dataDecode ip.IPpost) {
 	}
 	log.Printf("INFO: IP is set free for reallocation: %v\n", returnIP.IPaddress)
 }
+
+// curl "localhost:3000/getIP?key=a-185.9.249.220"
+// curl "localhost:3000/allAvailbleIPs"
+// curl -X POST -H 'content-type: application/json' --data '{"ip":"a-222.2.222.222","detail":{"MACaddress":"89-43-5F-60-DC-76","leaseTime":"2021-12-13T11:11:52.106975Z","available":true}}' http://localhost:3000/addIPtoPool
+// curl -X PUT -H "Content-Type: application/json" -d '{"targetIp":"a-185.9.249.220","ip":"na-185.9.249.220","detail":{"MACaddress":"11-11-11-11-11-","leaseTime":"2021-12-13T11:11:52.106975Z","available":true}}' http://localhost:3000/createNewIPpool
