@@ -15,10 +15,10 @@ spec:
         app: ip-pool-manager
     spec:
       containers:
-        - name: ip-pool-manager
-          image: ghcr.io/uerenreply/ip-pool-manager:main
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3000
+      - name: ip-pool-manager
+        image: ghcr.io/uerenreply/ip-pool-manager:main
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
       imagePullSecrets:
-        - name: ghcr
+      - name: ghcr
