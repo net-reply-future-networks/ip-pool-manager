@@ -93,5 +93,3 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		w.Write(responseIP) //nolint:errcheck
 	}
 }
-
-// curl "localhost:3000/getIP?key=a-185.9.249.220"

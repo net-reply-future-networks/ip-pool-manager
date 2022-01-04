@@ -79,5 +79,3 @@ func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 		w.Write([]byte("IP has changed \n")) //nolint:errcheck
 	}
 }
-
-// curl -X PUT -H "Content-Type: application/json" -d '{"targetIp":"a-185.9.249.220","ip":"na-185.9.249.220","detail":{"MACaddress":"11-11-11-11-11-","leaseTime":"2021-12-13T11:11:52.106975Z","available":true}}' http://localhost:3000/createNewIPpool
