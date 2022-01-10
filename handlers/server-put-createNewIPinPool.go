@@ -27,6 +27,9 @@ type putIPdetails struct {
 func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
+		fmt.Println("######################")
+		fmt.Println(r.Body)
+
 
 		// Creating a empty user post called "uIP"
 		var uPut putIPpost
