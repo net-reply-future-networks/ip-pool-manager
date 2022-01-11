@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"testing"
 )
 
@@ -10,8 +10,8 @@ func TestAllAvailbleIPs(t *testing.T) {
 	*requestOption = 1
 	var respMsg, respStatus = requestSelection(requestOption)
 
-	fmt.Println("Resp Status code", respStatus)
-	fmt.Println("Resp len ", len(respMsg))
+	log.Println("Resp Status code", respStatus)
+	log.Println("Resp len ", len(respMsg))
 
 	if len(respMsg) < 2 {
 		t.Errorf("Returned JSON is empty (Char less than 2)")
@@ -27,8 +27,8 @@ func TestGetIP(t *testing.T) {
 	*requestOption = 2
 	var respMsg, respStatus = requestSelection(requestOption)
 
-	fmt.Println("Resp Status code", respStatus)
-	fmt.Println("Resp len ", len(respMsg))
+	log.Println("Resp Status code", respStatus)
+	log.Println("Resp len ", len(respMsg))
 
 	if respStatus != "200 OK" {
 		t.Errorf("Return status is not 200 OK")
@@ -44,8 +44,8 @@ func TestDeleteIPfromPool(t *testing.T) {
 	*requestOption = 3
 	var respMsg, respStatus = requestSelection(requestOption)
 
-	fmt.Println("Resp Status code", respStatus)
-	fmt.Println("Resp len ", len(respMsg))
+	log.Println("Resp Status code", respStatus)
+	log.Println("Resp len ", len(respMsg))
 
 	if respStatus != "200 OK" {
 		t.Errorf("Return status is not 200 OK")
@@ -62,8 +62,8 @@ func TestAddIPtoPool(t *testing.T) {
 	*requestOption = 4
 	var respMsg, respStatus = requestSelection(requestOption)
 
-	fmt.Println("Resp Status code", respStatus)
-	fmt.Println("Resp len ", len(respMsg))
+	log.Println("Resp Status code", respStatus)
+	log.Println("Resp len ", len(respMsg))
 
 	if respStatus != "200 OK" {
 		t.Errorf("Return status is not 200 OK")
@@ -80,8 +80,8 @@ func TestCreateNewIPpool(t *testing.T) {
 	*requestOption = 5
 	var respMsg, respStatus = requestSelection(requestOption)
 
-	fmt.Println("Resp Status code", respStatus)
-	fmt.Println("Resp len ", len(respMsg))
+	log.Println("Resp Status code", respStatus)
+	log.Println("Resp len ", len(respMsg))
 
 	if respStatus != "200 OK" {
 		t.Errorf("Return status is not 200 OK")

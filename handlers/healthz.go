@@ -1,15 +1,13 @@
 package handlers
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
 func Healthz() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("-----------------------------")
-		fmt.Println("Response is", http.StatusOK)
-		fmt.Println("-----------------------------")
+		log.Println("DEBUG: Response is:  v%",  http.StatusOK)
 		w.WriteHeader(http.StatusOK)
 	}
 }

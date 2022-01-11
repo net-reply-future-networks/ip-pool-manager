@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
-	"fmt"
 	"ip-pool-manager/ip"
 	"log"
 	"net/http"
@@ -26,12 +25,12 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 
 		// Check if URL param is empty or if specified IP is not available
 		if param == "" {
-			fmt.Println("Empty URL parameter")
+			log.Println("Empty URL parameter")
 			w.Write([]byte("Empty URL parameter")) //nolint:errcheck
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		} else if strings.HasPrefix(param, "na-") {
-			fmt.Println("Must select available IP")
+			log.Println("Must select available IP")
 			w.Write([]byte("Must select available IP")) //nolint:errcheck
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -40,7 +39,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		// Retrieving IP stored in DB
 		val, err := rdb.Get(ctx, param).Result()
 		if err != nil {
-			fmt.Println("Cannot find IP")
+			log.Println("Cannot find IP")
 			w.Write([]byte("Cannot find IP")) //nolint:errcheck
 			w.WriteHeader(http.StatusBadRequest)
 			return

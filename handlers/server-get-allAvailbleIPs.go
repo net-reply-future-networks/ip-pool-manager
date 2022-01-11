@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
-	"fmt"
 	"ip-pool-manager/ip"
 	"log"
 	"net/http"
@@ -41,7 +40,7 @@ func getAllIPs(rdb *redis.Client) []ip.IPpost {
 		// Storing each IP in DB
 		foundIP, err := rdb.Get(ctx, iter.Val()).Result()
 		if err != nil {
-			fmt.Println("IP not found. ERR: ", err)
+			log.Println("IP not found. ERR: ", err)
 			continue
 		}
 
@@ -72,7 +71,7 @@ func findAvailbleIP(allIPs []ip.IPpost) []ip.IPpost {
 		if IP.Detail.Available {
 			allAvailbleIPs = append(allAvailbleIPs, IP)
 		} else {
-			fmt.Println(IP.IPaddress, " is not availble right now")
+			log.Println(IP.IPaddress, " is not availble right now")
 		}
 	}
 

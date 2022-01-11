@@ -31,11 +31,9 @@ func main() {
 	// Enables line logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.Parse()
-
+	
 	var respMsg, respStatus = requestSelection(requestOption)
-	fmt.Println(respMsg)
-	fmt.Println(respStatus)
-
+	log.Println("Response Message:", respMsg, "Response status:", respStatus)
 }
 
 func requestSelection(requestOption *int) (string, string) {
@@ -45,7 +43,7 @@ func requestSelection(requestOption *int) (string, string) {
 		// Get request to return all availble IPs
 		resp, err := http.Get("http://localhost:3000/allAvailbleIPs")
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer resp.Body.Close()
 
@@ -57,7 +55,7 @@ func requestSelection(requestOption *int) (string, string) {
 			respMsg = respMsg + scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		return respMsg, resp.Status
@@ -67,7 +65,7 @@ func requestSelection(requestOption *int) (string, string) {
 		// Get request to return specific IP
 		resp, err := http.Get("http://localhost:3000/getIP?key=a-185.9.249.220")
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer resp.Body.Close()
 
@@ -79,7 +77,7 @@ func requestSelection(requestOption *int) (string, string) {
 			respMsg = respMsg + scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		return respMsg, resp.Status
@@ -89,13 +87,13 @@ func requestSelection(requestOption *int) (string, string) {
 		// Delete request to delete specified IP
 		req, err := http.NewRequest("DELETE", "http://localhost:3000/deleteIPfromPool?key=a-102.131.46.22", nil)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		// Reads resp from request
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer resp.Body.Close()
 
@@ -107,7 +105,7 @@ func requestSelection(requestOption *int) (string, string) {
 			respMsg = respMsg + scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		return respMsg, resp.Status
@@ -127,7 +125,7 @@ func requestSelection(requestOption *int) (string, string) {
 		// Converts struct data to JSON byte data
 		payloadBytes, err := json.Marshal(data)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		// Convert byte data to a type of io reader. Needed to be passed in request
 		body := bytes.NewReader(payloadBytes)
@@ -135,13 +133,13 @@ func requestSelection(requestOption *int) (string, string) {
 		// POST request to add new dummy IP (converted to a byte io.reader)
 		req, err := http.NewRequest("POST", "http://localhost:3000/addIPtoPool", body)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		//	Sends the req and returns a response
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer resp.Body.Close()
 
@@ -163,7 +161,7 @@ func requestSelection(requestOption *int) (string, string) {
 		// Converts struct data to JSON byte data
 		payloadBytes, err := json.Marshal(data)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		// Convert byte data to a type of io reader. Needed to be passed in request
 		body := bytes.NewReader(payloadBytes)
@@ -171,13 +169,13 @@ func requestSelection(requestOption *int) (string, string) {
 		// PUT request to add new dummy putIP (converted to a byte io.reader)
 		req, err := http.NewRequest("PUT", "http://localhost:3000/createNewIPpool", body)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		//	Sends the req and returns a response
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer resp.Body.Close()
 

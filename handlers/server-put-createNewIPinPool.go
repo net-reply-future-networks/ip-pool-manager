@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"ip-pool-manager/ip"
 	"log"
 	"net/http"
@@ -27,15 +26,14 @@ type putIPdetails struct {
 func CreateNewIPinPool(rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
-		fmt.Println("######################")
-		fmt.Println(r.Body)
+		log.Println(r.Body)
 
 		// Creating a empty user post called "uIP"
 		var uPut putIPpost
 
 		// Decodes response JSON into a userPostIP object and catches any errors
 		if err := json.NewDecoder(r.Body).Decode(&uPut); err != nil {
-			fmt.Println("ERR: ", err)
+			log.Println("ERR: ", err)
 			w.WriteHeader(http.StatusBadGateway)
 			w.Write([]byte("Cannot decode request")) //nolint:errcheck
 

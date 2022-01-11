@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
-	"fmt"
 	"ip-pool-manager/ip"
 	"log"
 	"net/http"
@@ -22,7 +21,7 @@ func AddToIPtoPool(rdb *redis.Client) http.HandlerFunc {
 
 		// Decodes response JSON into a userPostIP object and catches any errors
 		if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-			fmt.Println("ERR: ", err)
+			log.Println("ERR: ", err)
 			w.WriteHeader(http.StatusBadGateway)
 			w.Write([]byte("Cannot decode request")) //nolint:errcheck
 			return
@@ -56,7 +55,7 @@ func encodeIP(ip ip.IPpost) string {
 	// struct to Gob
 	bufEn := &bytes.Buffer{}
 	if err := gob.NewEncoder(bufEn).Encode(ip); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	BufEnString := bufEn.String()
 
