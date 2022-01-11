@@ -20,7 +20,7 @@ func AllAvailbleIPs(rdb *redis.Client) http.HandlerFunc {
 		// Marshal data to return result to user
 		strAllAvailbleIPs, err := json.Marshal(allAvailbleIPs)
 		if err != nil {
-			panic(err)
+			log.Println(err)
 		}
 
 		// Setting response headers and content

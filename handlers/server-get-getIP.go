@@ -67,7 +67,7 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		// Convert IP struct into Gob format to store in DB
 		bufEn := &bytes.Buffer{}
 		if err := gob.NewEncoder(bufEn).Encode(returnIP); err != nil {
-			panic(err)
+			log.Println(err)
 		}
 		returnIPdecode := bufEn.String()
 
@@ -93,5 +93,3 @@ func GetIP(rdb *redis.Client) http.HandlerFunc {
 		w.Write(responseIP) //nolint:errcheck
 	}
 }
-
-// curl "localhost:3000/getIP?key=a-185.9.249.220"

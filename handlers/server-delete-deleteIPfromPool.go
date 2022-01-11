@@ -33,5 +33,3 @@ func DeleteIPfromPool(rdb *redis.Client) http.HandlerFunc {
 		w.Write([]byte(responseMsg)) //nolint:errcheck
 	}
 }
-
-// curl -X DELETE "localhost:3000/deleteIPfromPool?key=na-102.131.46.22"

@@ -62,5 +62,3 @@ func encodeIP(ip ip.IPpost) string {
 
 	return BufEnString
 }
-
-// curl -X POST -H 'content-type: application/json' --data '{"ip":"a-222.2.222.222","detail":{"MACaddress":"89-43-5F-60-DC-76","leaseTime":"2021-12-13T11:11:52.106975Z","available":true}}' http://localhost:3000/addIPtoPool

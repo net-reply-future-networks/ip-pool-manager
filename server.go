@@ -75,6 +75,10 @@ func main() {
 	r.Post("/addIPtoPool", handlers.AddToIPtoPool(rdb))
 	// Update IP details (Not create new IP)
 	r.Put("/createNewIPpool", handlers.CreateNewIPinPool(rdb))
+	// Health check to check if server is running
+	r.HandleFunc("/healthz", handlers.Healthz())
+	// Readiness check to check if DB is running
+	r.HandleFunc("/readyz", handlers.Readyz(rdb))
 
 	srv := &http.Server{Addr: serverAddress, Handler: r}
 
@@ -151,32 +155,6 @@ func addTestingIPs(rdb *redis.Client) {
 			continue
 		}
 	}
-
-	//TODO: For what is the code block used?
-	/*	// Loop used to iterate other each key in DB
-		iter := rdb.Scan(ctx, 0, "*", 0).Iterator()
-		for iter.Next(ctx) {
-			// Storing each IP in DB
-			foundIP, err := rdb.Get(ctx, iter.Val()).Result()
-			if err != nil {
-				log.Println("IP not found. ERR: ", err)
-			} else {
-				// log.Println(foundIP)
-
-				// Gob to Struct
-				bufDe := &bytes.Buffer{}
-
-				bufDe.WriteString(foundIP)
-
-				// Decode returned Gob format into IP struct
-				var dataDecode ip.IPpost
-				if err := gob.NewDecoder(bufDe).Decode(&dataDecode); err != nil {
-					log.Println(err)
-				}
-				// log.Println("data decoded from gob:", dataDecode)
-
-			}
-		}*/
 }
 
 // Encodes IP into glob format
@@ -260,8 +238,3 @@ func replaceNAip(rdb *redis.Client, dataDecode ip.IPpost) {
 	}
 	log.Printf("INFO: IP is set free for reallocation: %v\n", returnIP.IPaddress)
 }
-
-// curl "localhost:3000/getIP?key=a-185.9.249.220"
-// curl "localhost:3000/allAvailbleIPs"
-// curl -X POST -H 'content-type: application/json' --data '{"ip":"a-222.2.222.222","detail":{"MACaddress":"89-43-5F-60-DC-76","leaseTime":"2021-12-13T11:11:52.106975Z","available":true}}' http://localhost:3000/addIPtoPool
-// curl -X PUT -H "Content-Type: application/json" -d '{"targetIp":"a-185.9.249.220","ip":"na-185.9.249.220","detail":{"MACaddress":"11-11-11-11-11-","leaseTime":"2021-12-13T11:11:52.106975Z","available":true}}' http://localhost:3000/createNewIPpool
