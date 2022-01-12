@@ -39,18 +39,9 @@ Run Unitests
 go test
 ```
 
-## Contributing
+### List of available curl requests
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-
-## List of available curl requests
-
+```bash
 curl "localhost:3000/allAvailbleIPs"
 
 curl "localhost:3000/getIP?key=a-185.9.249.220"
@@ -64,3 +55,14 @@ curl -X PUT -H "Content-Type: application/json" -d '{"targetIp":"a-185.9.249.220
 curl "localhost:3000/healthz"
 
 curl "localhost:3000/readyz"
+```
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
