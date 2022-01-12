@@ -8,7 +8,7 @@ import (
 func TestAllAvailbleIPs(t *testing.T) {
 	requestOption = new(int)
 	*requestOption = 1
-	var respMsg, respStatus = requestSelection(requestOption)
+	respMsg, respStatus := requestSelection(requestOption)
 
 	log.Println("Resp Status code", respStatus)
 	log.Println("Resp len ", len(respMsg))
@@ -25,7 +25,7 @@ func TestAllAvailbleIPs(t *testing.T) {
 func TestGetIP(t *testing.T) {
 	requestOption = new(int)
 	*requestOption = 2
-	var respMsg, respStatus = requestSelection(requestOption)
+	respMsg, respStatus := requestSelection(requestOption)
 
 	log.Println("Resp Status code", respStatus)
 	log.Println("Resp len ", len(respMsg))
@@ -42,7 +42,7 @@ func TestGetIP(t *testing.T) {
 func TestDeleteIPfromPool(t *testing.T) {
 	requestOption = new(int)
 	*requestOption = 3
-	var respMsg, respStatus = requestSelection(requestOption)
+	respMsg, respStatus := requestSelection(requestOption)
 
 	log.Println("Resp Status code", respStatus)
 	log.Println("Resp len ", len(respMsg))
@@ -60,7 +60,7 @@ func TestDeleteIPfromPool(t *testing.T) {
 func TestAddIPtoPool(t *testing.T) {
 	requestOption = new(int)
 	*requestOption = 4
-	var respMsg, respStatus = requestSelection(requestOption)
+	respMsg, respStatus := requestSelection(requestOption)
 
 	log.Println("Resp Status code", respStatus)
 	log.Println("Resp len ", len(respMsg))
@@ -78,7 +78,7 @@ func TestAddIPtoPool(t *testing.T) {
 func TestCreateNewIPpool(t *testing.T) {
 	requestOption = new(int)
 	*requestOption = 5
-	var respMsg, respStatus = requestSelection(requestOption)
+	respMsg, respStatus := requestSelection(requestOption)
 
 	log.Println("Resp Status code", respStatus)
 	log.Println("Resp len ", len(respMsg))

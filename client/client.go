@@ -31,8 +31,8 @@ func main() {
 	// Enables line logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.Parse()
-	
-	var respMsg, respStatus = requestSelection(requestOption)
+
+	respMsg, respStatus := requestSelection(requestOption)
 	log.Println("Response Message:", respMsg, "Response status:", respStatus)
 }
 
