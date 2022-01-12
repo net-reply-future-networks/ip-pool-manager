@@ -6,89 +6,95 @@ import (
 )
 
 func TestAllAvailbleIPs(t *testing.T) {
-	requestOption = new(int)
-	*requestOption = 1
-	respMsg, respStatus := requestSelection(requestOption)
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+		requestOption = new(int)
+		*requestOption = 1
+		var respMsg, respStatus = requestSelection(requestOption)
 
-	log.Println("Resp Status code", respStatus)
-	log.Println("Resp len ", len(respMsg))
+		log.Printf("TESTING AllAvailbleIPs: Returned Resp Status code: %v. Returned Resp length: %v", respStatus, len(respMsg))
 
-	if len(respMsg) < 2 {
-		t.Errorf("Returned JSON is empty (Char less than 2)")
-	}
+		if respStatus != "200 OK" {
+			t.Errorf("Returned status is not 200 OK. Got %v", respStatus)
+		}
 
-	if respStatus != "200 OK" {
-		t.Errorf("Return status is not 200 OK")
+		if len(respMsg) < 2 {
+			t.Errorf("Returned JSON is empty (Char less than 2)")
+		}
 	}
 }
-
 func TestGetIP(t *testing.T) {
-	requestOption = new(int)
-	*requestOption = 2
-	respMsg, respStatus := requestSelection(requestOption)
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+		requestOption = new(int)
+		*requestOption = 2
+		var respMsg, respStatus = requestSelection(requestOption)
 
-	log.Println("Resp Status code", respStatus)
-	log.Println("Resp len ", len(respMsg))
+		log.Printf("TESTING GetIP: Returned Resp Status code: %v. Returned Resp length: %v", respStatus, len(respMsg))
 
-	if respStatus != "200 OK" {
-		t.Errorf("Return status is not 200 OK")
-	}
+		if respStatus != "200 OK" {
+			t.Errorf("Returned status is not 200 OK. Got %v", respStatus)
+		}
 
-	if len(respMsg) < 2 {
-		t.Errorf("Returned JSON is empty (Char less than 2)")
+		if len(respMsg) < 2 {
+			t.Errorf("Returned JSON is empty (Char less than 2)")
+		}
 	}
 }
 
 func TestDeleteIPfromPool(t *testing.T) {
-	requestOption = new(int)
-	*requestOption = 3
-	respMsg, respStatus := requestSelection(requestOption)
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+		requestOption = new(int)
+		*requestOption = 3
+		var respMsg, respStatus = requestSelection(requestOption)
 
-	log.Println("Resp Status code", respStatus)
-	log.Println("Resp len ", len(respMsg))
+		log.Printf("TESTING DeleteIPfromPool: Returned Resp Status code: %v. Returned Resp length: %v", respStatus, len(respMsg))
 
-	if respStatus != "200 OK" {
-		t.Errorf("Return status is not 200 OK")
-	}
+		if respStatus != "200 OK" {
+			t.Errorf("Returned status is not 200 OK. Got %v", respStatus)
+		}
 
-	if respMsg != "a-102.131.46.22 IP deleted " {
-		t.Errorf("Returned response message is incorrect.")
-		t.Errorf(respMsg)
+		if respMsg != "a-102.131.46.22 IP deleted " {
+			t.Errorf("Returned response message is incorrect. Got : %v", respMsg)
+		}
 	}
 }
 
 func TestAddIPtoPool(t *testing.T) {
-	requestOption = new(int)
-	*requestOption = 4
-	respMsg, respStatus := requestSelection(requestOption)
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+		requestOption = new(int)
+		*requestOption = 4
+		var respMsg, respStatus = requestSelection(requestOption)
 
-	log.Println("Resp Status code", respStatus)
-	log.Println("Resp len ", len(respMsg))
+		log.Printf("TESTING AddIPtoPool: Returned Resp Status code: %v. Returned Resp length: %v", respStatus, len(respMsg))
 
-	if respStatus != "200 OK" {
-		t.Errorf("Return status is not 200 OK")
-	}
+		if respStatus != "200 OK" {
+			t.Errorf("Returned status is not 200 OK. Got %v", respStatus)
+		}
 
-	if respMsg != "New IP posted" {
-		t.Errorf("Returned response message is incorrect.")
-		t.Errorf(respMsg)
+		if respMsg != "New IP posted" {
+			t.Errorf("Returned response message is incorrect. Got : %v", respMsg)
+		}
 	}
 }
 
 func TestCreateNewIPpool(t *testing.T) {
-	requestOption = new(int)
-	*requestOption = 5
-	respMsg, respStatus := requestSelection(requestOption)
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+		requestOption = new(int)
+		*requestOption = 5
+		var respMsg, respStatus = requestSelection(requestOption)
 
-	log.Println("Resp Status code", respStatus)
-	log.Println("Resp len ", len(respMsg))
+		log.Printf("TESTING CreateNewIPpool: Returned Resp Status code: %v. Returned Resp length: %v", respStatus, len(respMsg))
 
-	if respStatus != "200 OK" {
-		t.Errorf("Return status is not 200 OK")
-	}
+		if respStatus != "200 OK" {
+			t.Errorf("Returned status is not 200 OK. Got %v", respStatus)
+		}
 
-	if respMsg != "IP address a-253.14.93.192 changed to a-111.11.11.111" {
-		t.Errorf("Returned response message is incorrect.")
-		t.Errorf(respMsg)
+		if respMsg != "IP address a-253.14.93.192 changed to a-111.11.11.111" {
+			t.Errorf("Returned response message is incorrect. Got : %v", respMsg)
+		}
 	}
 }
