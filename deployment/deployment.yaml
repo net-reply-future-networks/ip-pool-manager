@@ -21,13 +21,13 @@ spec:
           ports:
             - containerPort: 3000
           livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-            httpHeaders:
-              - name: Custom-Header
-                value: Awesome
-          initialDelaySeconds: 3
-          periodSeconds: 3
+            httpGet:
+              path: /healthz
+              port: 3000
+              httpHeaders:
+                - name: Custom-Header
+                  value: Awesome
+            initialDelaySeconds: 3
+            periodSeconds: 3
       imagePullSecrets:
         - name: ghcr
