@@ -78,7 +78,7 @@ func main() {
 	// Health check to check if server is running
 	r.HandleFunc("/healthz", handlers.Healthz())
 	// Readiness check to check if DB is running
-	r.HandleFunc("/readyz", handlers.Readyz(rdb))
+	r.HandleFunc("/readyz", handlers.Readyz())
 
 	srv := &http.Server{Addr: serverAddress, Handler: r}
 
