@@ -28,7 +28,7 @@ var (
 	serverAddress = flag.String("address", "localhost", "port address")
 
 	redisPort    = flag.Int("redis-port", 6379, "port number of redis server")
-	redisAddress = flag.String("redis-address", "localhost", "port address of redis server")
+	redisAddress = flag.String("redis-address", "10.42.1.15", "port address of redis server")
 
 	serviceName = flag.String("name", "ip-pool-manager", "name of service")
 )
