@@ -24,11 +24,11 @@ import (
 
 // flags for custom port number and addresses to run server and redis server
 var (
-	serverPort    = flag.Int("port", 3000, "port number")
-	serverAddress = flag.String("address", "localhost", "port address")
+	serverPort    = flag.String("port", checkEnvVar(os.Getenv("SERVER_PORT"), "3000"), "port number")
+	serverAddress = flag.String("address", checkEnvVar(os.Getenv("SERVER_ADDRESS"), "localhost"), "port address")
 
-	redisPort    = flag.Int("redis-port", 6379, "port number of redis server")
-	redisAddress = flag.String("redis-address", "10.42.1.15", "port address of redis server")
+	redisPort    = flag.String("redis-port", checkEnvVar(os.Getenv("REDIS_PORT"), "6379"), "port number of redis server")
+	redisAddress = flag.String("redis-address", checkEnvVar(os.Getenv("REDIS_ADDRESS"), "10.42.1.5"), "port address of redis server")
 
 	serviceName = flag.String("name", "ip-pool-manager", "name of service")
 )
@@ -47,12 +47,10 @@ func main() {
 	log.Printf("INFO: Server address: %v\n", serverAddress)
 	log.Printf("INFO: Redis address: %v\n", rServerAddress)
 
-	// creating redis client
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     rServerAddress, // redis address
-		Password: "",             // no password set
-		DB:       0,              // use default DB
-	})
+	rdb, err := NewDatabase(rServerAddress)
+	if err != nil{
+		log.Printf("DB could not be created. Err: %v ",err)
+	}
 
 	addTestingIPs(rdb)
 
@@ -105,6 +103,30 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+func checkEnvVar (envVar string, defVal string) string{
+	if len(envVar) == 0{
+		return defVal
+	}
+	return envVar
+}
+
+func NewDatabase(rServerAddress string) (*redis.Client, error) {
+	// creating redis client
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     rServerAddress, // redis address
+		Password: "",             // no password set
+		DB:       0,              // use default DB
+	})
+
+	ctx := context.Background()
+	if err := rdb.Ping(ctx).Err(); err != nil {
+	   return nil, err
+	}
+
+	return rdb, nil
+ }
+
 
 func addTestingIPs(rdb *redis.Client) {
 	IP1 := ip.IPpost{
