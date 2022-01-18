@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ip-pool-manager-config
+data:
+  server_port: "1111"
+  server_address: "localhost"
+  redis_port: "1111"
+  redis_address: "11.11.1.11"
+# I used these port/address values to see if the values actually change
+
+# I apply the config using
+# kubectl apply -f deployment/ip-pool-manager-config.yaml
+
+# I check the config using this
+#  kubectl get configmaps ip-pool-manager-config -o yaml
