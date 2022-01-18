@@ -22,39 +22,12 @@ spec:
             - containerPort: 3000
           env:
             - name: SERVER_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: ip-pool-manager-config
-                  key: server_port
+              value: "3000"
             - name: SERVER_ADDRESS
-              valueFrom:
-                configMapKeyRef:
-                  name: ip-pool-manager-config
-                  key: server_address
+              value: "localhost"
             - name: REDIS_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: ip-pool-manager-config
-                  key: redis_port
+              value: "6379"
             - name: REDIS_ADDRESS
-              valueFrom:
-                configMapKeyRef:
-                  name: ip-pool-manager-config
-                  key: redis_address
-          # volumeMounts:
-          #   - name: config
-          #     mountPath: "/config"
-          #     readOnly: true
-      # volumes:
-      #   - name: config
-      #     configMap:
-      #       name: ip-pool-manager-config
+              value: "10.42.1.5" # Change address to Redis pod IP
       imagePullSecrets:
         - name: ghcr
-# i get a CreateContainerConfigError pod error.
-# when i describe the pod using (kubectl describe pod <pod id>)
-# i get an error saying " Error: couldn't find key server_port in ConfigMap default/ip-pool-manager-config"
-
-# i dont understand why the deployment file cant find the key even though i can see the env variables when using (kubectl get configmaps ip-pool-manager-config -o yaml)
-
-# i have also commented out the volume/volumeMount sections as i dont plan to store the env variables
