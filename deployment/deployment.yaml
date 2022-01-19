@@ -20,18 +20,18 @@ spec:
           # command: ["/bin/sh", "-c", "env"]
           ports:
             - containerPort: 3000
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 3000
-            initialDelaySeconds: 8
-            periodSeconds: 1
-          readinessProbe:
-            httpGet:
-              path: /readyz
-              port: 3000
-            initialDelaySeconds: 3
-            periodSeconds: 1
+          # livenessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 3000
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 20
+          # readinessProbe:
+          #   httpGet:
+          #     path: /readyz
+          #     port: 3000
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 20
           env:
             - name: SERVER_PORT
               valueFrom:

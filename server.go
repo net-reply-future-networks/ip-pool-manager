@@ -28,7 +28,7 @@ var (
 	serverAddress = flag.String("address", checkEnvVar(os.Getenv("SERVER_ADDRESS"), "localhost"), "port address")
 
 	redisPort    = flag.String("redis-port", checkEnvVar(os.Getenv("REDIS_PORT"), "6379"), "port number of redis server")
-	redisAddress = flag.String("redis-address", checkEnvVar(os.Getenv("REDIS_ADDRESS"), "10.42.1.15"), "port address of redis server")
+	redisAddress = flag.String("redis-address", checkEnvVar(os.Getenv("REDIS_ADDRESS"), "localhost"), "port address of redis server")
 
 	serviceName = flag.String("name", "ip-pool-manager", "name of service")
 )
