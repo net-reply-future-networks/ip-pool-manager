@@ -14,11 +14,11 @@ func Readyz(started time.Time) http.HandlerFunc {
 		if duration.Seconds() < 5 {
 			log.Printf("readyz status: %v\n", http.StatusInternalServerError)
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(fmt.Sprintf("error: %v", duration.Seconds())))
+			w.Write([]byte(fmt.Sprintf("error: %v", duration.Seconds()))) //nolint:errcheck
 		} else {
 			log.Printf("readyz status: %v\n", http.StatusOK)
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("ok"))
+			w.Write([]byte("ok")) //nolint:errcheck
 		}
 	}
 }

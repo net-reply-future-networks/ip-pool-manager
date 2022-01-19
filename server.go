@@ -51,8 +51,8 @@ func main() {
 	log.Printf("INFO: Redis address: %v\n", rServerAddress)
 
 	rdb, err := NewDatabase(rServerAddress)
-	if err != nil{
-		log.Printf("DB could not be created. Err: %v ",err)
+	if err != nil {
+		log.Printf("DB could not be created. Err: %v ", err)
 	}
 
 	addTestingIPs(rdb)
@@ -107,8 +107,8 @@ func main() {
 	}
 }
 
-func checkEnvVar (envVar string, defVal string) string{
-	if len(envVar) == 0{
+func checkEnvVar(envVar string, defVal string) string {
+	if len(envVar) == 0 {
 		return defVal
 	}
 	return envVar
@@ -124,12 +124,11 @@ func NewDatabase(rServerAddress string) (*redis.Client, error) {
 
 	ctx := context.Background()
 	if err := rdb.Ping(ctx).Err(); err != nil {
-	   return nil, err
+		return nil, err
 	}
 
 	return rdb, nil
- }
-
+}
 
 func addTestingIPs(rdb *redis.Client) {
 	IP1 := ip.IPpost{
