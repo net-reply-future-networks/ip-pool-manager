@@ -34,6 +34,9 @@ var (
 )
 
 func main() {
+	// Records when the server starts
+	started := time.Now()
+
 	log.SetFlags(log.LstdFlags | log.Lshortfile) // this enables line logging
 
 	flag.Parse()
@@ -74,9 +77,9 @@ func main() {
 	// Update IP details (Not create new IP)
 	r.Put("/createNewIPpool", handlers.CreateNewIPinPool(rdb))
 	// Health check to check if server is running
-	r.HandleFunc("/healthz", handlers.Healthz())
+	r.HandleFunc("/healthz", handlers.Healthz(started))
 	// Readiness check to check if DB is running
-	r.HandleFunc("/readyz", handlers.Readyz())
+	r.HandleFunc("/readyz", handlers.Readyz(started))
 
 	srv := &http.Server{Addr: serverAddress, Handler: r}
 

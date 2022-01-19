@@ -1,25 +1,24 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"time"
 )
 
-// readyz is a readiness probe.
-func Readyz() http.HandlerFunc {
-	return func(w http.ResponseWriter, _ *http.Request) {
-		// ctx := context.Background()
-
-		// Pings DB and sends bad request if DB does not ping back
-		// pong, err := rdb.Ping(ctx).Result()
-		// if err != nil {
-		// 	log.Println(err)
-		// 	w.WriteHeader(http.StatusBadRequest)
-		// 	w.Write([]byte("DB did not ping back. DB is not running \n")) //nolint:errcheck
-		// 	return
-		// }
-		// log.Println(pong, err)
-
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("DB did ping back. DB is running \n")) //nolint:errcheck
+// Readiness check to check if DB is running
+func Readyz(started time.Time) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		duration := time.Since(started)
+		if duration.Seconds() < 5 {
+			log.Printf("readyz status: %v\n", http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("error: %v", duration.Seconds())))
+		} else {
+			log.Printf("readyz status: %v\n", http.StatusOK)
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("ok"))
+		}
 	}
 }
