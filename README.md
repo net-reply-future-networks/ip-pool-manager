@@ -66,3 +66,4 @@ Please make sure to update tests as appropriate.
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+[![Docker](https://github.com/net-reply-future-networks/ip-pool-manager/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/net-reply-future-networks/ip-pool-manager/actions/workflows/docker-publish.yml)
